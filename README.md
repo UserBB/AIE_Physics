@@ -1,6 +1,8 @@
 # "Caleb" Framework
 
-This hacked together version of the "AIEFramework" is intended to be used by AIE students with Visual Studio 2013.
+This hacked together version of the "AIEFramework" is intended to be used by AIE students with Visual Studio 2013. It is designed to be capable of being built right out of the box if the Autodesk FBX SDK 2015 for VS2013 is installed to its default directory.
+
+No support will be provided for this version of the framework.
 
 # Installation Instructions
 
