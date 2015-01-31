@@ -78,6 +78,8 @@ public:
 	static void		addHermiteSpline(const glm::vec3& a_start, const glm::vec3& a_end,
 									 const glm::vec3& a_tangentStart, const glm::vec3& a_tangentEnd, unsigned int a_segments, const glm::vec4& a_colour);
 
+	static void		addGrid(const glm::vec3& a_center, const glm::mat4* a_transform, int increments, float size);
+
 	// 2-dimensional gizmos
 	static void		add2DLine(const glm::vec2& a_start, const glm::vec2& a_end, const glm::vec4& a_colour);
 	static void		add2DLine(const glm::vec2& a_start, const glm::vec2& a_end, const glm::vec4& a_colour0, const glm::vec4& a_colour1);	

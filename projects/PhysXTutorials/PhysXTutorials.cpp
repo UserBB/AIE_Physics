@@ -10,6 +10,9 @@
 #define DEFAULT_SCREENWIDTH 1280
 #define DEFAULT_SCREENHEIGHT 720
 
+const int MAX_BULLET_LIFE = 100;
+bool GLFWMouseButton1Down = false;
+
 using namespace physx;
 
 PxFoundation* g_PhysicsFoundation = nullptr;
@@ -76,8 +79,16 @@ void PhysXTutorials::onUpdate(float a_deltaTime)
 						 i == 10 ? glm::vec4(1,1,1,1) : glm::vec4(0,0,0,1) );
 	}
 
-	updatePhysx();
+	// add a plane
+	//glm::mat4 planeRotateMatrix = glm::rotate(0.0f, 0.0f, 1.0f, 0.0f); // 9:37 in video
 
+	static float count = 1;
+	count += .01f;
+	
+	//ballgun();
+
+	updatePhysx();
+	
 	// quit our application when escape is pressed
 	if (glfwGetKey(m_window,GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		quit();
@@ -128,7 +139,7 @@ void PhysXTutorials::setUpPhysXTutorial()
 	// create physics material
 	g_PhysicsMaterial = g_Physics->createMaterial(0.5f, 0.5f, 0.6f);
 	PxSceneDesc sceneDesc(g_Physics->getTolerancesScale());
-	sceneDesc.gravity = PxVec3(0, -30.0f, 0);
+	sceneDesc.gravity = PxVec3(0, -3.0f, 0);
 	sceneDesc.filterShader = gDefaultFilterShader;
 	sceneDesc.cpuDispatcher = PxDefaultCpuDispatcherCreate(1);
 	g_PhysicsScene = g_Physics->createScene(sceneDesc);
@@ -155,6 +166,24 @@ void PhysXTutorials::updatePhysx()
 	{
 		// don't need anything here yet, but still need the fetch *?*
 	}
+
+	// Add widgets to represent all the physX actors which are in the scene
+	for (auto actor : g_PhysXActors)
+	{
+		PxU32 nShapes = actor->getNbShapes();
+		PxShape** shapes = new PxShape*[nShapes];
+		actor->getShapes(shapes, nShapes);
+		// Render all the shapes in the physx actor (for early tutorials there is just one)
+		while (nShapes--)
+		{
+			addWidget(shapes[nShapes], actor);
+		}
+		delete[] shapes;
+	}
+
+	// add widget for ground (static widget not in g_PhysXActors)
+	//addPlane();
+
 }
 
 // ======================================================================================================
@@ -166,14 +195,144 @@ void PhysXTutorials::tutorial_1()
 	PxRigidStatic* plane = PxCreateStatic(*g_Physics, pose, PxPlaneGeometry(), *g_PhysicsMaterial);
 	// add it to the physX scene
 	g_PhysicsScene->addActor(*plane);
-
-	// add a box
-	float density = 10;
-	PxBoxGeometry box(2, 2, 2);
-	PxTransform transform(PxVec3(0, 20, 0));
-	PxRigidDynamic* dynamicActor = PxCreateDynamic(*g_Physics, transform, box, *g_PhysicsMaterial, density);
-	// add it to the physX scene
-	g_PhysicsScene->addActor(*dynamicActor);
 	// add it to our copy of the scene
-	g_PhysXActors.push_back(dynamicActor);
+	//g_PhysXActors.push_back(plane);
+	{
+		// add a sphere
+		float density = 10;
+		PxSphereGeometry sphere(5);
+		PxTransform transform(PxVec3(0, 5, 0));
+		PxRigidDynamic* dynamicActor = PxCreateDynamic(*g_Physics, transform, sphere, *g_PhysicsMaterial, density);
+		// add it to the physX scene
+		g_PhysicsScene->addActor(*dynamicActor);
+		// add it to our copy of the scene
+		g_PhysXActors.push_back(dynamicActor);
+	}
+	{
+		// add a box
+		float density = 10;
+		PxBoxGeometry box(2, 2, 2);
+		PxTransform transform(PxVec3(0, 20, 0));
+		PxRigidDynamic* dynamicActor = PxCreateDynamic(*g_Physics, transform, box, *g_PhysicsMaterial, density);
+		// add it to the physX scene
+		g_PhysicsScene->addActor(*dynamicActor);
+		// add it to our copy of the scene
+		g_PhysXActors.push_back(dynamicActor);
+	}
+}
+
+//void PhysXTutorials::ballgun()
+//{
+//	float muzzleSpeed = -100;
+//	GLFWwindow* window = glfwGetCurrentContext();
+//	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS && !GLFWMouseButton1Down)
+//	{
+//		GLFWMouseButton1Down = true;
+//		PxSphereGeometry sphere(1);
+//		// get the camera position from the camera matrix
+//		glm::vec3 position(m_cameraMatrix[3]);
+//		// get the camera rotation from the camera matrix
+//		glm::vec3 direction(m_cameraMatrix[2]);
+//		physx::PxVec3 velocity = physx::PxVec3(direction.x, direction.y, direction.z);
+//		float density = 500;
+//		PxTransform transform(PxVec3(position.x, position.y, position.z), PxQuat::createIdentity());
+//		PxRigidDynamic *dynamicActor = PxCreateDynamic(*g_Physics, transform, sphere, *g_PhysicsMaterial, density);
+//		dynamicActor->setLinearVelocity(velocity, true);
+//		g_PhysicsScene->addActor(*dynamicActor);
+//		g_PhysXActors.push_back(dynamicActor);
+//		bullets.push_back(new BulletStruct(dynamicActor));
+//	}
+//}
+
+// ======================================================================================================
+
+void PhysXTutorials::addWidget(PxShape* shape, PxRigidDynamic* actor)
+{
+	PxGeometryType::Enum type = shape->getGeometryType();
+	switch (type)
+	{
+		case PxGeometryType::eSPHERE:
+		addSphere(shape, actor);
+		break;
+
+	case PxGeometryType::eBOX:
+		addBox(shape, actor);
+		break;
+	}
+}
+
+// not working quite right at the moment
+void PhysXTutorials::addPlane()
+{
+	// get the geometry for this PhysX collision volume
+	PxPlaneGeometry geometry;
+	float size = 1;
+	//bool status = shape->getPlaneGeometry(geometry);
+	/*if (status)
+	{
+		size = geometry
+	}*/
+	// get the transform for this PhysX collision volume
+	//PxMat44 m(PxShapeExt::getGlobalPose(*shape));
+	glm::mat4 M(1);
+	glm::vec3 position(0);
+	int increments = 100;
+	// create our box gizmo
+	//Gizmos::addGrid(position, &M, increments, size);
+} 
+
+void PhysXTutorials::addSphere(PxShape* shape, PxRigidDynamic* actor)
+{
+	// get the geometry for this PhysX collision volume
+	PxSphereGeometry geometry;
+	float radius = 1;
+	bool status = shape->getSphereGeometry(geometry);
+	if (status)
+	{
+		radius = geometry.radius;
+	}
+	// get the transform for this PhysX collision volume
+	PxMat44 m(PxShapeExt::getGlobalPose(*shape));
+	glm::mat4 M(m.column0.x, m.column0.y, m.column0.z, m.column0.w,
+		m.column1.x, m.column1.y, m.column1.z, m.column1.w,
+		m.column2.x, m.column2.y, m.column2.z, m.column2.w,
+		m.column3.x, m.column3.y, m.column3.z, m.column3.w);
+	glm::vec3 position;
+	// get the position out of the transform
+	position.x = m.getPosition().x;
+	position.y = m.getPosition().y;
+	position.z = m.getPosition().z;
+	int resolution = 10;
+	glm::vec4 color = glm::vec4(1, 0.5, 0, 1);
+	// create our box gizmo
+	Gizmos::addSphere(position, radius, resolution, resolution, color, &M);
+}
+
+void PhysXTutorials::addBox(PxShape* shape, PxRigidDynamic* actor)
+{
+	// get the geometry for this PhysX collision volume
+	PxBoxGeometry geometry;
+	float width = 1, height = 1, length = 1;
+	bool status = shape->getBoxGeometry(geometry);
+	if (status)
+	{
+		width = geometry.halfExtents.x;
+		height = geometry.halfExtents.y;
+		length = geometry.halfExtents.z;
+	}
+	// get the transform for this PhysX collision volume
+	PxMat44 m(PxShapeExt::getGlobalPose(*shape));
+	glm::mat4 M(m.column0.x, m.column0.y, m.column0.z, m.column0.w,
+				m.column1.x, m.column1.y, m.column1.z, m.column1.w,
+				m.column2.x, m.column2.y, m.column2.z, m.column2.w,
+				m.column3.x, m.column3.y, m.column3.z, m.column3.w);
+	glm::vec3 position;
+	// get the position out of the transform
+	position.x = m.getPosition().x;
+	position.y = m.getPosition().y;
+	position.z = m.getPosition().z;
+	glm::vec3 extents = glm::vec3(width, height, length);
+	glm::vec4 color = glm::vec4(1, 0, 0, 1);
+	// create our box gizmo
+	Gizmos::addAABBFilled(position, extents, color, &M);
 }

@@ -621,6 +621,26 @@ void Gizmos::addHermiteSpline(const glm::vec3& a_start, const glm::vec3& a_end,
 	}
 }
 
+void Gizmos::addGrid(const glm::vec3& a_center, const glm::mat4* a_transform, int increments, float size)
+{
+	int halfIncrements = increments / 2;
+	for (int i = 0; i < increments + 1; ++i)
+	{
+		glm::vec4 color = i == halfIncrements ? glm::vec4(1, 0, 1, 1) : glm::vec4(0, 0, 0, 1);
+		glm::vec3 l1Start = glm::vec3((-halfIncrements + i)*size, 0, halfIncrements*size);
+		glm::vec3 l1End = glm::vec3((-halfIncrements + i)*size, 0, -halfIncrements*size);
+		glm::vec3 l2Start = glm::vec3((halfIncrements + i)*size, 0, (-halfIncrements + i)*size);
+		glm::vec3 l2End = glm::vec3((-halfIncrements + i)*size, 0, (-halfIncrements + i)*size);
+
+		l1Start = (*a_transform * glm::vec4(l1Start, 0)).xyz + a_center;
+		l1End = (*a_transform * glm::vec4(l1End, 0)).xyz + a_center;
+		l2Start = (*a_transform * glm::vec4(l2Start, 0)).xyz + a_center;
+		l2End = (*a_transform * glm::vec4(l2End, 0)).xyz + a_center;
+		Gizmos::addLine(l1Start, l1End, color);
+		Gizmos::addLine(l2Start, l2End, color);
+	}
+}
+
 void Gizmos::addLine(const glm::vec3& a_rv0,  const glm::vec3& a_rv1, const glm::vec4& a_colour)
 {
 	addLine(a_rv0,a_rv1,a_colour,a_colour);

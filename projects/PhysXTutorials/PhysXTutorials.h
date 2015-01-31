@@ -20,6 +20,11 @@ public:
 
 	void tutorial_1();
 
+	void addWidget(PxShape* shape, PxRigidDynamic* actor);
+	void addPlane();
+	void addSphere(PxShape* shape, PxRigidDynamic* actor);
+	void addBox(PxShape* shape, PxRigidDynamic* actor);
+
 protected:
 
 	virtual bool onCreate(int a_argc, char* a_argv[]);
