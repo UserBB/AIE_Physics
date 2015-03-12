@@ -68,13 +68,20 @@ void RigidBody::applyForceToActor(RigidBody* actorB, glm::vec3 force)
 	applyForce(-force);
 }
 
+void RigidBody::collisionResponse(glm::vec3 collisionPoint)
+{
+	// for now we'll just set the velocity to zero
+	velocity = glm::vec3(0, 0, 0);
+	collisionPoint = collisionPoint;
+}
+
+
 void RigidBody::update(glm::vec3 gravity, float timeStep)
 {
+	applyForce(gravity * mass * timeStep);
+	oldPosition = position; 
 	position += velocity * timeStep;
-	//applyForce(gravity * mass * timeStep);
-	/*oldPosition = position; 
-	position += velocity * timeStep;
-	rotationMatrix = glm::rotate(rotation, 0.0f, 0.0f, 1.0f); glm::rotate()*/
+	//rotationMatrix = glm::rotate(rotation, 0.0f, 0.0f, 1.0f);
 }
 
 // scene --------------------
@@ -84,6 +91,7 @@ void Scene::update()
 	for (auto actor : actors)
 	{
 		actor->update(gravity, Utility::getDeltaTime());
+		collisionCheck(actor);
 		actor->createGizmo();
 	}
 
@@ -101,4 +109,99 @@ void Scene::removeActor(PhysObj* object)
 	{
 		actors.erase(item);
 	}
+}
+
+typedef bool(*fn)(PhysObj*, PhysObj*);
+//function pointer array for doing our collisions
+
+static fn collisionFunctionArray[] =
+{ Scene::plane2plane, Scene::plane2sphere,
+Scene::sphere2plane, Scene::sphere2sphere };
+
+void Scene::collisionCheck(PhysObj* A)
+{
+	// check for collisions against all but this one
+	for (PhysObj* B : actors)
+	{
+		if (A != B)
+		{
+			int idA = A->shapeID;
+			int idB = B->shapeID;
+			// ignore collision if either is a spring
+			if (idA < NUMBERSHAPE && idB < NUMBERSHAPE)
+			{
+				int functionIndex = (idA * NUMBERSHAPE) + idB;
+				fn collisionFunction = collisionFunctionArray[functionIndex];
+				if (collisionFunction != NULL)
+				{
+					collisionFunction(A, B);
+				}
+			}
+		}
+	}
+}
+
+bool Scene::sphere2sphere(PhysObj* objA, PhysObj* objB)
+{
+	//try to cast objects to ball and ball
+	Sphere *A = dynamic_cast<Sphere*>(objA);
+	Sphere *B = dynamic_cast<Sphere*>(objB);
+	//if we are successful then test for collision
+	if (A != NULL && B != NULL)
+	{
+		glm::vec3 delta = B->position - A->position;
+		float distance = glm::length(delta);
+		float intersection = A->radius + B->radius - distance;
+		if (intersection > 0)
+		{
+			glm::vec3 collisionNormal = glm::normalize(delta);
+			glm::vec3 relativeVelocity = A->velocity - B->velocity;
+			glm::vec3 collisionVector = collisionNormal * (glm::dot(relativeVelocity, collisionNormal));
+			glm::vec3 forceVector = collisionVector * 2.0f / (1 / A->mass + 1 / B->mass);
+			A->applyForceToActor(B, forceVector);
+			glm::vec3 seperationVector = collisionNormal * intersection * .505f;
+			A->position -= seperationVector;
+			B->position += seperationVector;
+			return true;
+		}
+	}
+	return false;
+}
+
+bool Scene::plane2sphere(PhysObj* A, PhysObj* B)
+{
+	//we just need to reverse the order of arguments and pass them into our sphere to plane collision detectio
+	//don't want to write the same code twice :)
+	return sphere2plane(B, A);
+}
+
+bool Scene::sphere2plane(PhysObj* A, PhysObj* B)
+{
+	//try to cast objects to ball and plane
+	Sphere *sphere = dynamic_cast<Sphere*>(A);
+	Plane *plane = dynamic_cast<Plane*>(B);
+	//if we are successful then check for collision
+	if (sphere != NULL && plane != NULL)
+	{
+		float sphereToPlane = glm::dot(sphere->position, plane->normal) - plane->distance;
+		if (abs(sphereToPlane) < sphere->radius)//use abs because collision on both sides
+		{
+			//calculate collision response:
+			glm::vec3 planeNormal = plane->normal;
+			if (sphereToPlane <0)
+			{
+				planeNormal *= -1.0f; //flip the normal if we are behind the plane
+			}
+			glm::vec3 planeForceVector = sphere->mass * planeNormal * (glm::dot(planeNormal, sphere->velocity));
+			sphere->applyForce(-2.0f * planeForceVector);
+			return true;
+		}
+	}
+	return false;
+}
+
+bool Scene::plane2plane(PhysObj* plane, PhysObj* plane2)
+{
+	//never used but we'll add it for completeness
+	return false;
 }

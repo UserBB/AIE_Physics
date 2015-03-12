@@ -11,8 +11,8 @@ enum ShapeType
 {
 	PLANE = 0,
 	SPHERE = 1,
-	BOX = 2,
-	NUMBERSHAPE = 3,
+	//BOX = 2,
+	NUMBERSHAPE = 2,
 };
 
 class PhysObj
@@ -51,7 +51,7 @@ public:
 	RigidBody(glm::vec3 position, glm::vec3 velocity, float rotation, float mass);
 	virtual void update(glm::vec3 gravity, float timeStep);
 	//virtual void debug();
-	//virtual void collisionResponse(glm::vec3 collisionPoint);
+	virtual void collisionResponse(glm::vec3 collisionPoint);
 	virtual void resetPosition(){ position = oldPosition; };
 	void applyForce(glm::vec3 force);
 	void RigidBody::applyForceToActor(RigidBody* actorB, glm::vec3 force);
@@ -79,6 +79,9 @@ public:
 	// void solveIntersections();
 	void debugScene();
 	void updateGizmos();
-	// bool collisionCheck();
+	void collisionCheck(PhysObj* A);
 	static bool sphere2sphere(PhysObj* A, PhysObj* B);
+	static bool sphere2plane(PhysObj* ball, PhysObj* plane);
+	static bool plane2sphere(PhysObj* plane, PhysObj* ball);
+	static bool plane2plane(PhysObj* plane, PhysObj* plane2);
 };

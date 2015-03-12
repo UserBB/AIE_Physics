@@ -44,7 +44,7 @@ bool DIY_Physics::onCreate(int a_argc, char* a_argv[])
 		aspectRatio, -fSize, fSize, 0, farPlane);
 
 	// create a perspective projection matrix with a 90 degree field-of-view and widescreen aspect ratio
-	//m_projectionMatrix = glm::perspective(glm::pi<float>() * 0.25f, DEFAULT_SCREENWIDTH/(float)DEFAULT_SCREENHEIGHT, 0.1f, 1000.0f);
+	// m_projectionMatrix = glm::perspective(glm::pi<float>() * 0.25f, DEFAULT_SCREENWIDTH/(float)DEFAULT_SCREENHEIGHT, 0.1f, 1000.0f);
 
 	// set the clear colour and enable depth testing and backface culling
 	glClearColor(0.25f,0.25f,0.25f,1);
@@ -55,15 +55,21 @@ bool DIY_Physics::onCreate(int a_argc, char* a_argv[])
 	Sphere *newSphere;
 	scene = new Scene();
 	scene->gravity = glm::vec3(0, -10, 0);
-	scene->timeStep = .1f;
-	newSphere = new Sphere(glm::vec3(-40, 0, 0), PI / 4.0f, 30.0f, 0, 3.0f, 1, glm::vec4(1, 0, 0, 1));
+	//scene->timeStep = .1f;
+	/*newSphere = new Sphere(glm::vec3(-40, 0, 0), PI / 4.0f, 30.0f, 0, 3.0f, 1, glm::vec4(1, 0, 0, 1));
 	scene->addActor(newSphere);
 	newSphere = new Sphere(glm::vec3(-40, 0, 0), PI / 3.0f, 30.0f, 0, 3.0f, 1, glm::vec4(0, 1, 0, 1));
 	scene->addActor(newSphere);
 	newSphere = new Sphere(glm::vec3(-40, 0, 0), PI / 2.0f, 30.0f, 0, 3.0f, 1, glm::vec4(0, 0, 1, 1));
 	scene->addActor(newSphere);
 	newSphere = new Sphere(glm::vec3(-40, 0, 0), 0, 30.0f, 0, 3.0f, 1, glm::vec4(1, 1, 0, 1));
+	scene->addActor(newSphere);*/
+	newSphere = new Sphere(glm::vec3(-40, 20, 0), glm::vec3(10.0f, 0, 0), 0, 13.0f, 1, glm::vec4(1, 0.5f, 0, 1));
 	scene->addActor(newSphere);
+	newSphere = new Sphere(glm::vec3(40, 20, 0), glm::vec3(-10.0f, 0, 0), 0, 13.0f, 1, glm::vec4(1, 0.1f, 0.75, 1));
+	scene->addActor(newSphere);
+	Plane* newPlane = new Plane(glm::vec3(1,0,0), 200.0f);
+	scene->addActor(newPlane);
 	return true;
 }
 
@@ -73,7 +79,7 @@ void DIY_Physics::onUpdate(float a_deltaTime)
 	Utility::freeMovement( m_cameraMatrix, a_deltaTime, 10 );
 
 	// clear all gizmos from last frame
-	//Gizmos::clear();
+	Gizmos::clear();
 	
 	// add an identity matrix gizmo
 	Gizmos::addTransform( glm::mat4(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1) );
