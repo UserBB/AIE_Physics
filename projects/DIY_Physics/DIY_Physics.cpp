@@ -5,8 +5,7 @@
 #include <GLFW/glfw3.h>
 #include <glm/ext.hpp>
 
-#include "Scene.h"
-#include "Shapes.h"
+#include "Physics_Framework.h"
 
 #define DEFAULT_SCREENWIDTH 1280
 #define DEFAULT_SCREENHEIGHT 720
@@ -57,14 +56,14 @@ bool DIY_Physics::onCreate(int a_argc, char* a_argv[])
 	scene = new Scene();
 	scene->gravity = glm::vec3(0, -10, 0);
 	scene->timeStep = .1f;
-	newSphere = new Sphere(glm::vec3(-40, 0, 0), glm::vec3(PI / 4.0f, 30.0f, 0), 0, 3.0f, 1, glm::vec4(1, 0, 0, 1));
-	scene->AddActor(newSphere);
-	newSphere = new Sphere(glm::vec3(-40, 0, 0), glm::vec3(PI / 3.0f, 30.0f, 0), 0, 3.0f, 1, glm::vec4(0, 1, 0, 1));
-	scene->AddActor(newSphere);
-	newSphere = new Sphere(glm::vec3(-40, 0, 0), glm::vec3(PI / 2.0f, 30.0f, 0), 0, 3.0f, 1, glm::vec4(0, 0, 1, 1));
-	scene->AddActor(newSphere);
-	newSphere = new Sphere(glm::vec3(-40, 0, 0), glm::vec3(0, 30.0f, 0), 0, 3.0f, 1, glm::vec4(1, 1, 0, 1));
-	scene->AddActor(newSphere);
+	newSphere = new Sphere(glm::vec3(-40, 0, 0), PI / 4.0f, 30.0f, 0, 3.0f, 1, glm::vec4(1, 0, 0, 1));
+	scene->addActor(newSphere);
+	newSphere = new Sphere(glm::vec3(-40, 0, 0), PI / 3.0f, 30.0f, 0, 3.0f, 1, glm::vec4(0, 1, 0, 1));
+	scene->addActor(newSphere);
+	newSphere = new Sphere(glm::vec3(-40, 0, 0), PI / 2.0f, 30.0f, 0, 3.0f, 1, glm::vec4(0, 0, 1, 1));
+	scene->addActor(newSphere);
+	newSphere = new Sphere(glm::vec3(-40, 0, 0), 0, 30.0f, 0, 3.0f, 1, glm::vec4(1, 1, 0, 1));
+	scene->addActor(newSphere);
 	return true;
 }
 
@@ -74,20 +73,22 @@ void DIY_Physics::onUpdate(float a_deltaTime)
 	Utility::freeMovement( m_cameraMatrix, a_deltaTime, 10 );
 
 	// clear all gizmos from last frame
-	Gizmos::clear();
+	//Gizmos::clear();
 	
 	// add an identity matrix gizmo
 	Gizmos::addTransform( glm::mat4(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1) );
 
-	// add a 20x20 grid on the XZ-plane
-	for ( int i = 0 ; i < 21 ; ++i )
-	{
-		Gizmos::addLine( glm::vec3(-10 + i, 0, 10), glm::vec3(-10 + i, 0, -10), 
-						 i == 10 ? glm::vec4(1,1,1,1) : glm::vec4(0,0,0,1) );
-		
-		Gizmos::addLine( glm::vec3(10, 0, -10 + i), glm::vec3(-10, 0, -10 + i), 
-						 i == 10 ? glm::vec4(1,1,1,1) : glm::vec4(0,0,0,1) );
-	}
+	//// add a 20x20 grid on the XZ-plane
+	//for ( int i = 0 ; i < 21 ; ++i )
+	//{
+	//	Gizmos::addLine( glm::vec3(-10 + i, 0, 10), glm::vec3(-10 + i, 0, -10), 
+	//					 i == 10 ? glm::vec4(1,1,1,1) : glm::vec4(0,0,0,1) );
+	//	
+	//	Gizmos::addLine( glm::vec3(10, 0, -10 + i), glm::vec3(-10, 0, -10 + i), 
+	//					 i == 10 ? glm::vec4(1,1,1,1) : glm::vec4(0,0,0,1) );
+	//}
+
+	scene->update();
 
 	// quit our application when escape is pressed
 	if (glfwGetKey(m_window,GLFW_KEY_ESCAPE) == GLFW_PRESS)
