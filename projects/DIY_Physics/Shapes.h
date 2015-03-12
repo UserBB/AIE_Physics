@@ -11,4 +11,5 @@ public:
 		int a_mass,
 		glm::vec4 a_color);
 	~Sphere();
+
 };

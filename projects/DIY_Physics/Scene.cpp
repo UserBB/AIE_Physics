@@ -17,6 +17,14 @@ void Scene::AddActor(Actor* a)
 	ActorList.push_back(a);
 }
 
+void Scene::Update()
+{
+	// iterate through all the actors on our scene
+	for (auto actor:ActorList)
+	{
+		actor->Update(gravity, timeStep);
+	}
+}
 
 
 

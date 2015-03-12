@@ -34,10 +34,18 @@ bool DIY_Physics::onCreate(int a_argc, char* a_argv[])
 	Gizmos::create();
 
 	// create a world-space matrix for a camera
-	m_cameraMatrix = glm::inverse( glm::lookAt(glm::vec3(10,10,10),glm::vec3(0,0,0), glm::vec3(0,1,0)) );
-	
+	//m_cameraMatrix = glm::inverse( glm::lookAt(glm::vec3(10,10,10),glm::vec3(0,0,0), glm::vec3(0,1,0)) );
+	m_cameraMatrix = glm::inverse(glm::lookAt(glm::vec3(0, 0, 100),
+		glm::vec3(0, 0, 0), glm::vec3(0, 1, 0)));
+	float aspectRatio = DEFAULT_SCREENWIDTH / (float)DEFAULT_SCREENHEIGHT;
+	// create a an orthogonal projection matrix.
+	float fSize = 50;
+	float farPlane = 200;
+	m_projectionMatrix = glm::ortho<float>(-fSize*aspectRatio, fSize*
+		aspectRatio, -fSize, fSize, 0, farPlane);
+
 	// create a perspective projection matrix with a 90 degree field-of-view and widescreen aspect ratio
-	m_projectionMatrix = glm::perspective(glm::pi<float>() * 0.25f, DEFAULT_SCREENWIDTH/(float)DEFAULT_SCREENHEIGHT, 0.1f, 1000.0f);
+	//m_projectionMatrix = glm::perspective(glm::pi<float>() * 0.25f, DEFAULT_SCREENWIDTH/(float)DEFAULT_SCREENHEIGHT, 0.1f, 1000.0f);
 
 	// set the clear colour and enable depth testing and backface culling
 	glClearColor(0.25f,0.25f,0.25f,1);
