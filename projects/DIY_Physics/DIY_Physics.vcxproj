@@ -76,9 +76,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="DIY_Physics.cpp" />
+    <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="Shapes.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Actor.h" />
     <ClInclude Include="DIY_Physics.h" />
+    <ClInclude Include="Scene.h" />
+    <ClInclude Include="Shapes.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

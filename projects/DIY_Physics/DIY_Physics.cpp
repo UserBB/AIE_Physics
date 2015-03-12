@@ -5,8 +5,18 @@
 #include <GLFW/glfw3.h>
 #include <glm/ext.hpp>
 
+#include "Scene.h"
+#include "Shapes.h"
+
 #define DEFAULT_SCREENWIDTH 1280
 #define DEFAULT_SCREENHEIGHT 720
+
+#define PI 3.14159265359
+
+// ------------------------------------------------
+Scene* scene;
+
+
 
 DIY_Physics::DIY_Physics()
 {
@@ -34,6 +44,19 @@ bool DIY_Physics::onCreate(int a_argc, char* a_argv[])
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 
+	//-----------------------------------
+	Sphere *newSphere;
+	scene = new Scene();
+	scene->gravity = glm::vec3(0, -10, 0);
+	scene->timeStep = .1f;
+	newSphere = new Sphere(glm::vec3(-40, 0, 0), glm::vec3(PI / 4.0f, 30.0f, 0), 0, 3.0f, 1, glm::vec4(1, 0, 0, 1));
+	scene->AddActor(newSphere);
+	newSphere = new Sphere(glm::vec3(-40, 0, 0), glm::vec3(PI / 3.0f, 30.0f, 0), 0, 3.0f, 1, glm::vec4(0, 1, 0, 1));
+	scene->AddActor(newSphere);
+	newSphere = new Sphere(glm::vec3(-40, 0, 0), glm::vec3(PI / 2.0f, 30.0f, 0), 0, 3.0f, 1, glm::vec4(0, 0, 1, 1));
+	scene->AddActor(newSphere);
+	newSphere = new Sphere(glm::vec3(-40, 0, 0), glm::vec3(0, 30.0f, 0), 0, 3.0f, 1, glm::vec4(1, 1, 0, 1));
+	scene->AddActor(newSphere);
 	return true;
 }
 
