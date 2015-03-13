@@ -42,7 +42,7 @@ Sphere::Sphere(glm::vec3 position, float angle, float speed, float rotation, flo
 
 void Sphere::createGizmo()
 {
-	Gizmos::addSphere(position, 15, 15, radius, color);
+	Gizmos::addSphere(position, radius, 15, 15, color);
 }
 
 // rigidbody --------------
