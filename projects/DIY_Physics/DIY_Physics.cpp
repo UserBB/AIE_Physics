@@ -64,12 +64,14 @@ bool DIY_Physics::onCreate(int a_argc, char* a_argv[])
 	scene->addActor(newSphere);
 	newSphere = new Sphere(glm::vec3(-40, 0, 0), 0, 30.0f, 0, 3.0f, 1, glm::vec4(1, 1, 0, 1));
 	scene->addActor(newSphere);*/
-	newSphere = new Sphere(glm::vec3(-40, 20, 0), glm::vec3(10.0f, 0, 0), 0, 13.0f, 1, glm::vec4(1, 0.5f, 0, 1));
+	newSphere = new Sphere(glm::vec3(-40, 20, 0), glm::vec3(30.0f, 0, 0), 0, 3.0f, 1, glm::vec4(1, 0.5f, 0, 1));
 	scene->addActor(newSphere);
-	newSphere = new Sphere(glm::vec3(40, 20, 0), glm::vec3(-10.0f, 0, 0), 0, 13.0f, 1, glm::vec4(1, 0.1f, 0.75, 1));
+	newSphere = new Sphere(glm::vec3(40, 20, 0), glm::vec3(-30.0f, 0, 0), 0, 3.0f, 1, glm::vec4(1, 0.1f, 0.75, 1));
 	scene->addActor(newSphere);
-	Plane* newPlane = new Plane(glm::vec3(1,0,0), 200.0f);
-	scene->addActor(newPlane);
+	/*Plane* newPlane = new Plane(glm::vec3(0,1,0), 200.0f);
+	scene->addActor(newPlane);*/
+	Box* newBox = new Box(glm::vec3(0, -1, 0), glm::vec3(0), 0, 1, 5, 20, glm::vec4(0, 1, 0, 1));
+	scene->addActor(newBox);
 	return true;
 }
 
