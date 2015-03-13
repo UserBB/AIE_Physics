@@ -96,13 +96,20 @@ void RigidBody::applyForceToActor(RigidBody* actorB, glm::vec3 force)
 	applyForce(-force);
 }
 
+void RigidBody::collisionResponse(glm::vec3 collisionPoint)
+{
+	// for now we'll just set the velocity to zero
+	velocity = glm::vec3(0, 0, 0);
+	collisionPoint = collisionPoint;
+}
+
+
 void RigidBody::update(glm::vec3 gravity, float timeStep)
 {
+	applyForce(gravity * mass * timeStep);
+	oldPosition = position; 
 	position += velocity * timeStep;
-	//applyForce(gravity * mass * timeStep);
-	/*oldPosition = position; 
-	position += velocity * timeStep;
-	rotationMatrix = glm::rotate(rotation, 0.0f, 0.0f, 1.0f); glm::rotate()*/
+	//rotationMatrix = glm::rotate(rotation, 0.0f, 0.0f, 1.0f);
 }
 
 // scene --------------------
@@ -112,10 +119,6 @@ void Scene::update()
 	for (auto actor : actors)
 	{
 		actor->update(gravity, Utility::getDeltaTime());
-<<<<<<< HEAD
-=======
-		actor->createGizmo();
->>>>>>> parent of 04497f8... sphere collision/response
 	}
 
 	bool runPhysics = true;
@@ -153,7 +156,6 @@ void Scene::removeActor(PhysObj* object)
 	{
 		actors.erase(item);
 	}
-<<<<<<< HEAD
 }
 
 typedef bool(*fn)(PhysObj*, PhysObj*);
@@ -444,6 +446,4 @@ bool Scene::sphere2Box(PhysObj* obj1, PhysObj* obj2)
 void Scene::solveIntersections(PhysObj* offender)
 {
 	offender->resetPosition();
-=======
->>>>>>> parent of 04497f8... sphere collision/response
 }
