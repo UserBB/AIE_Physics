@@ -63,7 +63,7 @@ public:
 	RigidBody(glm::vec3 position, glm::vec3 velocity, float rotation, float mass);
 	virtual void update(glm::vec3 gravity, float timeStep);
 	//virtual void debug();
-	virtual void collisionResponse(glm::vec3 collisionPoint);
+	//virtual void collisionResponse(glm::vec3 collisionPoint);
 	virtual void resetPosition(){ position = oldPosition; };
 	void applyForce(glm::vec3 force);
 	void RigidBody::applyForceToActor(RigidBody* actorB, glm::vec3 force);
@@ -100,6 +100,7 @@ public:
 	void solveIntersections(PhysObj * offender);
 	void debugScene();
 	void updateGizmos();
+<<<<<<< HEAD
 	PhysObj* collisionCheck();
 	static bool sphere2sphere(PhysObj* A, PhysObj* B);
 	static bool sphere2plane(PhysObj* ball, PhysObj* plane);
@@ -111,4 +112,8 @@ public:
 	static bool plane2Box(PhysObj* ball, PhysObj* plane);
 	static bool sphere2Box(PhysObj* plane, PhysObj* ball);
 	static int box2PlaneHelper(glm::vec3* verts, glm::vec3 normal, float distance);
+=======
+	// bool collisionCheck();
+	static bool sphere2sphere(PhysObj* A, PhysObj* B);
+>>>>>>> parent of 04497f8... sphere collision/response
 };
